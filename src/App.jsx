@@ -9,6 +9,39 @@ ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarEle
 
 function App() {
 
+
+    const [checklist, setChecklist] = useState({
+        macro: [], // Inicialmente vazio
+        micro: [], // Inicialmente vazio
+        execução: [], // Inicialmente vazio
+    });
+
+    const [newTask, setNewTask] = useState('');
+    const [showChecklist, setShowChecklist] = useState(false);
+
+    // Função para adicionar uma nova tarefa em uma seção específica
+    const handleAddTask = (section) => {
+        if (newTask.trim()) {
+            setChecklist({
+                ...checklist,
+                [section]: [...checklist[section], { task: newTask, completed: false }],
+            });
+            setNewTask('');
+        }
+    };
+
+
+    // Função para remover uma tarefa em uma seção específica
+    const handleToggleComplete = (index) => {
+        const updatedChecklist = [...checklist];
+        updatedChecklist[index].completed = !updatedChecklist[index].completed;
+        setChecklist(updatedChecklist);
+    };
+
+    const handleRemoveTask = (index) => {
+        const updatedChecklist = checklist.filter((_, i) => i !== index);
+        setChecklist(updatedChecklist);
+    };
     const tradesSectionRef = React.createRef();
     const handleDateClick = (dataStr) => {
         // Rola para a seção de Trades Cadastrados
@@ -200,25 +233,100 @@ function App() {
         return { trades: tradesDoDia.length, resultado };
     };
 
+
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-black dark:text-white p-6 relative flex justify-center">
             <div className="w-full max-w-screen-xl">
                 <h1 className="text-3xl font-bold mb-6 text-center text-gray-800 dark:text-gray-100">Diário de Trade</h1>
                 <div className="flex justify-end mb-4">
-                    <button
+                    <button 
                         onClick={handleLogout}
-                        className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                        className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
                     >
                         Sair
                     </button>
                 </div>
 
+                {/* Botão para exibir/esconder o checklist */}
+                <div className="fixed bottom-4 right-4">
+                    <button 
+                        onClick={() => setShowChecklist(!showChecklist)}
+                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+                    >
+                        {showChecklist ? 'Fechar Checklist' : 'Abrir Checklist'}
+                    </button>
+                </div>
 
+                {/* Checklist Operacional */}
+                {showChecklist && (
+                    <div className="fixed bottom-16 right-4 bg-white dark:bg-gray-800 border rounded-lg shadow-lg w-96 p-4">
+                        <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">
+                            Checklist Operacional
+                        </h3>
+
+                        {/* Área rolável com altura fixa */}
+                        <div className="h-[600px] overflow-y-auto">
+                            {/* Renderizar seções do checklist */}
+                            {Object.entries(checklist).map(([section, tasks]) => (
+                                <div key={section} className="mb-6">
+                                    <h4 className="text-md font-semibold mb-2 capitalize">{section}</h4>
+                                    <ul className="space-y-2">
+                                        {tasks.map((item, index) => (
+                                            <li
+                                                key={index}
+                                                className="flex items-center justify-between bg-gray-100 dark:bg-gray-700 p-2 rounded"
+                                            >
+                                                <label className="flex items-center space-x-2">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={item.completed}
+                                                        onChange={() => handleToggleComplete(section, index)}
+                                                        className="form-checkbox h-5 w-5 text-blue-600"
+                                                    />
+                                                    <span
+                                                        className={`text-sm ${
+                                                            item.completed ? 'line-through text-gray-500' : ''
+                                                        }`}
+                                                    >
+                                                        {item.task}
+                                                    </span>
+                                                </label>
+                                                <button
+                                                    onClick={() => handleRemoveTask(section, index)}
+                                                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+                                                >
+                                                    Remover
+                                                </button>
+                                            </li>
+                                        ))}
+                                    </ul>
+
+                                    {/* Campo para adicionar nova tarefa */}
+                                    <div className="flex items-center space-x-2 mt-2">
+                                        <input
+                                            type="text"
+                                            value={newTask}
+                                            onChange={(e) => setNewTask(e.target.value)}
+                                            placeholder={`Adicionar tarefa em ${section}`}
+                                            className="border rounded px-2 py-1 flex-grow bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
+                                        />
+                                        <button
+                                            onClick={() => handleAddTask(section)}
+                                            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+                                        >
+                                            Adicionar
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 <div className="flex justify-end items-center gap-4 mb-4">
                     <button
                         onClick={() => setDarkMode(prev => !prev)}
-                        className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
                         title={darkMode ? "Light Mode" : "Dark Mode"}
                     >
                         {darkMode ? <Sun size={20} /> : <Moon size={20} />}
@@ -424,8 +532,8 @@ function App() {
                                         data-trade-date={trade.data} // Adiciona um atributo para identificar a data
 
                                         className={`hover:bg-gray-100 dark:hover:bg-gray-700 ${index % 2 === 0
-                                                ? "bg-gray-50 dark:bg-gray-800"
-                                                : ""
+                                            ? "bg-gray-50 dark:bg-gray-800"
+                                            : ""
                                             }`}
 
                                     >
@@ -441,10 +549,10 @@ function App() {
                                         </td>
                                         <td
                                             className={`p-2 border dark:border-gray-600 ${trade.resultado === "Win"
-                                                    ? "text-green-500"
-                                                    : trade.resultado === "Loss"
-                                                        ? "text-red-500"
-                                                        : "text-yellow-500"
+                                                ? "text-green-500"
+                                                : trade.resultado === "Loss"
+                                                    ? "text-red-500"
+                                                    : "text-yellow-500"
                                                 }`}
                                         >
                                             {trade.resultado}
@@ -817,6 +925,6 @@ function App() {
 
         </div>
     );
-}
 
+}
 export default App;
