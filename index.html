@@ -8,5 +8,13 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <!-- Garantir que o JavaScript pode manipular a classe do <html> -->
+    <script>
+      // Recupera o tema salvo no localStorage
+      const savedTheme = localStorage.getItem('darkMode');
+      if (savedTheme === 'true') {
+        document.documentElement.classList.add('dark'); // Aplica o tema escuro se salvo
+      }
+    </script>
   </body>
 </html>
