@@ -9,6 +9,22 @@ ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarEle
 
 function App() {
 
+    const tradesSectionRef = React.createRef();
+    const handleDateClick = (dataStr) => {
+        // Rola para a seção de Trades Cadastrados
+        tradesSectionRef.current.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+        });
+
+        // Destacar o trade correspondente (opcional, pode ser visualmente ajustado)
+        const tradeRow = document.querySelector(`[data-trade-date="${dataStr}"]`);
+        if (tradeRow) {
+            tradeRow.classList.add("bg-yellow-200");
+            setTimeout(() => tradeRow.classList.remove("bg-yellow-200"), 2000); // Remove o destaque após 2 segundos
+        }
+    };
+
     const [editingIndex, setEditingIndex] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [modalDia, setModalDia] = useState(null);
@@ -31,7 +47,7 @@ function App() {
     const [trades, setTrades] = useState([]);
 
     console.log('isAuthenticated:', isAuthenticated);
-    console.log('trades:', trades); 
+    console.log('trades:', trades);
 
     // Ler o estado de autenticação do localStorage
     useEffect(() => {
@@ -196,8 +212,9 @@ function App() {
                         Sair
                     </button>
                 </div>
-            
-                
+
+
+
                 <div className="flex justify-end items-center gap-4 mb-4">
                     <button
                         onClick={() => setDarkMode(prev => !prev)}
@@ -284,7 +301,7 @@ function App() {
                         <p className="text-xl font-bold">{`${moeda}${mediaPorOperacao}`}</p>
                     </div>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="bg-white dark:bg-gray-800 border rounded p-4">
                         <h3 className="font-semibold mb-2">Resultado Diário (Mês Atual)</h3>
@@ -301,7 +318,7 @@ function App() {
                         </div>
                     </div>
                 </div>
-                    
+
                 <div className="bg-white dark:bg-gray-800 border rounded p-4">
                     <div className="bg-white dark:bg-gray-800 border rounded p-4">
                         <h2 className="text-lg font-semibold mb-2">Estatísticas do Mês</h2>
@@ -359,7 +376,9 @@ function App() {
                             return (
                                 <div
                                     key={index}
+
                                     onClick={() => {
+                                        handleDateClick(resumoDoDia.dataStr)  // Clique na data
                                         const doDia = trades.filter(t => t.data === dataStr);
                                         setModalDia({ dia, dataStr, doDia });
                                     }}
@@ -381,133 +400,138 @@ function App() {
                 </div>
 
 
-                        {/* Seção de Trades Cadastrados */}
-                        <div className="bg-white dark:bg-gray-800 border rounded p-4 mt-6">
-                            <h2 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">Trades Cadastrados</h2>
-                            {trades.length === 0 ? (
-                                <p className="text-sm text-gray-600 dark:text-gray-400">Nenhum trade cadastrado ainda.</p>
-                            ) : (
-                                <table className="w-full border-collapse">
-                                    <thead>
-                                        <tr className="text-left bg-gray-100 dark:bg-gray-700">
-                                            <th className="p-2 border dark:border-gray-600">Data</th>
-                                            <th className="p-2 border dark:border-gray-600">Ativo</th>
-                                            <th className="p-2 border dark:border-gray-600">Resultado</th>
-                                            <th className="p-2 border dark:border-gray-600">Valor</th>
-                                            <th className="p-2 border dark:border-gray-600">Imagens e Comentários</th>
-                                            <th className="p-2 border dark:border-gray-600">Ações</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {trades.map((trade, index) => (
-                                            <tr
-                                                key={index}
-                                                className={`hover:bg-gray-100 dark:hover:bg-gray-700 ${
-                                                    index % 2 === 0
-                                                        ? "bg-gray-50 dark:bg-gray-800"
-                                                        : ""
+                {/* Seção de Trades Cadastrados */}
+                <div ref={tradesSectionRef} className="bg-white dark:bg-gray-800 border rounded p-4 mt-6">
+                    <h2 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">Trades Cadastrados</h2>
+                    {trades.length === 0 ? (
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Nenhum trade cadastrado ainda.</p>
+                    ) : (
+                        <table className="w-full border-collapse">
+                            <thead>
+                                <tr className="text-left bg-gray-100 dark:bg-gray-700">
+                                    <th className="p-2 border dark:border-gray-600">Data</th>
+                                    <th className="p-2 border dark:border-gray-600">Ativo</th>
+                                    <th className="p-2 border dark:border-gray-600">Resultado</th>
+                                    <th className="p-2 border dark:border-gray-600">Valor</th>
+                                    <th className="p-2 border dark:border-gray-600">Imagens e Comentários</th>
+                                    <th className="p-2 border dark:border-gray-600">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {trades.map((trade, index) => (
+                                    <tr
+                                        key={index}
+                                        data-trade-date={trade.data} // Adiciona um atributo para identificar a data
+
+                                        className={`hover:bg-gray-100 dark:hover:bg-gray-700 ${index % 2 === 0
+                                                ? "bg-gray-50 dark:bg-gray-800"
+                                                : ""
+                                            }`}
+
+                                    >
+                                        <td className="p-2 border dark:border-gray-600">{trade.data}</td>
+                                        <td className="p-2 border dark:border-gray-600">{trade.ativo || "N/A"}</td>
+                                        <td className="p-2 border dark:border-gray-600">{trade.resultado}</td>
+                                        <td className="p-2 border dark:border-gray-600">{`${moeda}${trade.valor.toFixed(2)}`}</td>
+                                        <td className="p-2 border dark:border-gray-600">
+                                            {trade.data}
+                                        </td>
+                                        <td className="p-2 border dark:border-gray-600">
+                                            {trade.ativo || "N/A"}
+                                        </td>
+                                        <td
+                                            className={`p-2 border dark:border-gray-600 ${trade.resultado === "Win"
+                                                    ? "text-green-500"
+                                                    : trade.resultado === "Loss"
+                                                        ? "text-red-500"
+                                                        : "text-yellow-500"
                                                 }`}
-                                            >
-                                                <td className="p-2 border dark:border-gray-600">
-                                                    {trade.data}
-                                                </td>
-                                                <td className="p-2 border dark:border-gray-600">
-                                                    {trade.ativo || "N/A"}
-                                                </td>
-                                                <td
-                                                    className={`p-2 border dark:border-gray-600 ${
-                                                        trade.resultado === "Win"
-                                                            ? "text-green-500"
-                                                            : trade.resultado === "Loss"
-                                                            ? "text-red-500"
-                                                            : "text-yellow-500"
-                                                    }`}
-                                                >
-                                                    {trade.resultado}
-                                                </td>
-                                                <td className="p-2 border dark:border-gray-600">
-                                                    {`${moeda}${trade.valor.toFixed(2)}`}
-                                                </td>
-                                                <td className="p-2 border dark:border-gray-600">
-                                                    {/* Imagens */}
-                                                    <div className="flex space-x-2 overflow-x-scroll">
-                                                        {trade.imagens && trade.imagens.length > 0 ? (
-                                                            trade.imagens.map((imagem, imgIndex) => (
-                                                                imagem.url ? (
-                                                                    <a
-                                                                        key={imgIndex}
-                                                                        href={imagem.url}
-                                                                        target="_blank"
-                                                                        rel="noopener noreferrer"
-                                                                        className="block w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded overflow-hidden hover:opacity-90"
-                                                                    >
-                                                                        <img
-                                                                            src={imagem.url}
-                                                                            alt={`Imagem ${imgIndex + 1}`}
-                                                                            className="w-full h-full object-cover"
-                                                                        />
-                                                                    </a>
-                                                                ) : (
-                                                                    <div
-                                                                        key={imgIndex}
-                                                                        className="w-12 h-12 bg-gray-200 dark:bg-gray-600 rounded flex items-center justify-center text-xs text-gray-500 dark:text-gray-400"
-                                                                    >
-                                                                        N/A
-                                                                    </div>
-                                                                )
-                                                            ))
+                                        >
+                                            {trade.resultado}
+                                        </td>
+                                        <td className="p-2 border dark:border-gray-600">
+                                            {`${moeda}${trade.valor.toFixed(2)}`}
+                                        </td>
+                                        <td className="p-2 border dark:border-gray-600">
+                                            {/* Imagens */}
+                                            <div className="flex space-x-2 overflow-x-scroll">
+                                                {trade.imagens && trade.imagens.length > 0 ? (
+                                                    trade.imagens.map((imagem, imgIndex) => (
+                                                        imagem.url ? (
+                                                            <a
+                                                                key={imgIndex}
+                                                                href={imagem.url}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="block w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded overflow-hidden hover:opacity-90"
+                                                            >
+                                                                <img
+                                                                    src={imagem.url}
+                                                                    alt={`Imagem ${imgIndex + 1}`}
+                                                                    className="w-full h-full object-cover"
+                                                                />
+                                                            </a>
                                                         ) : (
-                                                            <div className="flex items-center space-x-2">
-                                                                {[...Array(5)].map((_, i) => (
-                                                                    <div
-                                                                        key={i}
-                                                                        className="w-12 h-12 bg-gray-200 dark:bg-gray-600 rounded flex items-center justify-center text-xs text-gray-500 dark:text-gray-400"
-                                                                    >
-                                                                        N/A
-                                                                    </div>
-                                                                ))}
+                                                            <div
+                                                                key={imgIndex}
+                                                                className="w-12 h-12 bg-gray-200 dark:bg-gray-600 rounded flex items-center justify-center text-xs text-gray-500 dark:text-gray-400"
+                                                            >
+                                                                N/A
                                                             </div>
-                                                        )}
+                                                        )
+                                                    ))
+                                                ) : (
+                                                    <div className="flex items-center space-x-2">
+                                                        {[...Array(5)].map((_, i) => (
+                                                            <div
+                                                                key={i}
+                                                                className="w-12 h-12 bg-gray-200 dark:bg-gray-600 rounded flex items-center justify-center text-xs text-gray-500 dark:text-gray-400"
+                                                            >
+                                                                N/A
+                                                            </div>
+                                                        ))}
                                                     </div>
-                                                    {/* Comentários */}
-                                                    {trade.imagens.map((imagem, imgIndex) => (
-                                                        <div key={imgIndex} className="mt-2">
-                                                            {imagem.comment && (
-                                                                <details className="mt-1">
-                                                                    <summary className="text-blue-500 hover:underline cursor-pointer text-sm">
-                                                                        Ver comentário{" "}
-                                                                        {imgIndex + 1}
-                                                                    </summary>
-                                                                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                                                        {imagem.comment}
-                                                                    </p>
-                                                                </details>
-                                                            )}
-                                                        </div>
-                                                    ))}
-                                                </td>
-                                                <td className="p-2 border dark:border-gray-600">
-                                                    <button
-                                                        onClick={() => editarTrade(index)}
-                                                        className="text-blue-500 hover:underline mr-2"
-                                                        title="Editar este trade"
-                                                    >
-                                                        ✏️
-                                                    </button>
-                                                    <button
-                                                        onClick={() => removerTrade(index)}
-                                                        className="text-red-500 hover:underline"
-                                                        title="Remover este trade"
-                                                    >
-                                                        🗑️
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            )}
-                        </div>
+                                                )}
+                                            </div>
+                                            {/* Comentários */}
+                                            {trade.imagens.map((imagem, imgIndex) => (
+                                                <div key={imgIndex} className="mt-2">
+                                                    {imagem.comment && (
+                                                        <details className="mt-1">
+                                                            <summary className="text-blue-500 hover:underline cursor-pointer text-sm">
+                                                                Ver comentário{" "}
+                                                                {imgIndex + 1}
+                                                            </summary>
+                                                            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                                                {imagem.comment}
+                                                            </p>
+                                                        </details>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </td>
+                                        <td className="p-2 border dark:border-gray-600">
+                                            <button
+                                                onClick={() => editarTrade(index)}
+                                                className="text-blue-500 hover:underline mr-2"
+                                                title="Editar este trade"
+                                            >
+                                                ✏️
+                                            </button>
+                                            <button
+                                                onClick={() => removerTrade(index)}
+                                                className="text-red-500 hover:underline"
+                                                title="Remover este trade"
+                                            >
+                                                🗑️
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
+                </div>
                 {showModal && (
                     <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
                         <div className="bg-white dark:bg-gray-800 p-6 rounded shadow-lg w-full max-w-md relative">
@@ -526,7 +550,8 @@ function App() {
                                         { url: "", comment: "" },
                                         { url: "", comment: "" },
                                         { url: "", comment: "" },
-                                    ] });
+                                    ]
+                                });
                             }} className="absolute top-2 right-3 text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white">&times;</button>
                             <h2 className="text-lg font-bold mb-4">{editingIndex !== null ? 'Editar Operação' : 'Registrar Operação'}</h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -611,13 +636,15 @@ function App() {
                                     onClick={() => {
                                         setShowModal(false);
                                         setEditingIndex(null);
-                                        setNovoTrade({ data: '', ativo: "", resultado: "Win", valor: "", comentario: "", imagens: [
-                                            { url: "", comment: "" },
-                                            { url: "", comment: "" },
-                                            { url: "", comment: "" },
-                                            { url: "", comment: "" },
-                                            { url: "", comment: "" },
-                                        ] });
+                                        setNovoTrade({
+                                            data: '', ativo: "", resultado: "Win", valor: "", comentario: "", imagens: [
+                                                { url: "", comment: "" },
+                                                { url: "", comment: "" },
+                                                { url: "", comment: "" },
+                                                { url: "", comment: "" },
+                                                { url: "", comment: "" },
+                                            ]
+                                        });
                                     }}
                                     className="bg-gray-300 dark:bg-gray-500 text-gray-700 dark:text-gray-300 px-4 py-2 rounded hover:bg-gray-400 dark:hover:bg-gray-600 w-24"
                                 >
@@ -634,161 +661,161 @@ function App() {
                     </div>
                 )}
 
-{showModal && (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
-        <div
-            className="bg-white dark:bg-gray-800 p-6 rounded shadow-lg w-full max-w-md relative overflow-y-auto"
-            style={{
-                maxHeight: "90vh", // Limita a altura máxima para 90% da altura da viewport
-            }}
-        >
-            {/* Botão para fechar o modal */}
-            <button
-                onClick={() => {
-                    setShowModal(false);
-                    setEditingIndex(null);
-                    setNovoTrade({
-                        data: '',
-                        ativo: "",
-                        resultado: "Win",
-                        valor: "",
-                        comentario: "",
-                        imagens: [
-                            { url: "", comment: "" },
-                            { url: "", comment: "" },
-                            { url: "", comment: "" },
-                            { url: "", comment: "" },
-                            { url: "", comment: "" },
-                        ],
-                    });
-                }}
-                className="absolute top-2 right-3 text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white"
-            >
-                &times;
-            </button>
-            <h2 className="text-lg font-bold mb-4">
-                {editingIndex !== null ? "Editar Operação" : "Registrar Operação"}
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <input
-                    type="date"
-                    value={novoTrade.data}
-                    onChange={(e) => setNovoTrade({ ...novoTrade, data: e.target.value })}
-                    className="border p-2 rounded bg-white dark:bg-gray-700 text-black dark:text-white"
-                    placeholder="Data"
-                />
-                <input
-                    type="text"
-                    placeholder="Ativo (ex: XAU/USD)"
-                    value={novoTrade.ativo}
-                    onChange={(e) => setNovoTrade({ ...novoTrade, ativo: e.target.value })}
-                    className="border p-2 rounded bg-white dark:bg-gray-700 text-black dark:text-white"
-                />
-                <select
-                    value={novoTrade.resultado}
-                    onChange={(e) => setNovoTrade({ ...novoTrade, resultado: e.target.value })}
-                    className="border p-2 rounded bg-white dark:bg-gray-700 text-black dark:text-white"
-                >
-                    <option value="Win">Win</option>
-                    <option value="Loss">Loss</option>
-                    <option value="Breakeven">Breakeven</option>
-                </select>
-                <input
-                    type="number"
-                    placeholder="Resultado Financeiro (ex: 100.50)"
-                    value={novoTrade.valor}
-                    onChange={(e) => setNovoTrade({ ...novoTrade, valor: e.target.value })}
-                    className="border p-2 rounded bg-white dark:bg-gray-700 text-black dark:text-white"
-                />
-            </div>
-            <textarea
-                placeholder="Comentários gerais sobre a operação"
-                value={novoTrade.comentario}
-                onChange={(e) => setNovoTrade({ ...novoTrade, comentario: e.target.value })}
-                className="border p-2 rounded w-full mb-6 bg-white dark:bg-gray-700 text-black dark:text-white"
-            />
-            {/* Inputs para até 5 imagens e seus comentários */}
-            <h3 className="text-lg font-semibold mb-4 text-gray-700 dark:text-gray-200">
-                Imagens e Comentários
-            </h3>
-            <div className="space-y-4">
-                {novoTrade.imagens.map((imagem, index) => (
-                    <div
-                        key={index}
-                        className="border rounded-lg p-4 bg-gray-100 dark:bg-gray-700 text-black dark:text-white shadow-sm"
-                    >
-                        <div className="mb-3">
-                            <input
-                                type="text"
-                                placeholder={`URL da Imagem ${index + 1}`}
-                                value={imagem.url}
-                                onChange={(e) => handleImageChange(index, "url", e.target.value)}
-                                className="border p-2 rounded w-full bg-white dark:bg-gray-800 text-black dark:text-white"
-                            />
-                        </div>
-                        <textarea
-                            placeholder={`Comentário da Imagem ${index + 1}`}
-                            value={imagem.comment}
-                            onChange={(e) => handleImageChange(index, "comment", e.target.value)}
-                            className="border p-2 rounded w-full bg-white dark:bg-gray-800 text-black dark:text-white"
-                        />
-                        <div className="flex justify-end mt-3">
+                {showModal && (
+                    <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+                        <div
+                            className="bg-white dark:bg-gray-800 p-6 rounded shadow-lg w-full max-w-md relative overflow-y-auto"
+                            style={{
+                                maxHeight: "90vh", // Limita a altura máxima para 90% da altura da viewport
+                            }}
+                        >
+                            {/* Botão para fechar o modal */}
                             <button
                                 onClick={() => {
-                                    const novasImagens = novoTrade.imagens.filter(
-                                        (_, i) => i !== index
-                                    );
-                                    setNovoTrade({ ...novoTrade, imagens: novasImagens });
+                                    setShowModal(false);
+                                    setEditingIndex(null);
+                                    setNovoTrade({
+                                        data: '',
+                                        ativo: "",
+                                        resultado: "Win",
+                                        valor: "",
+                                        comentario: "",
+                                        imagens: [
+                                            { url: "", comment: "" },
+                                            { url: "", comment: "" },
+                                            { url: "", comment: "" },
+                                            { url: "", comment: "" },
+                                            { url: "", comment: "" },
+                                        ],
+                                    });
                                 }}
-                                className="text-red-500 hover:text-red-700 text-sm"
+                                className="absolute top-2 right-3 text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white"
                             >
-                                Remover
+                                &times;
                             </button>
+                            <h2 className="text-lg font-bold mb-4">
+                                {editingIndex !== null ? "Editar Operação" : "Registrar Operação"}
+                            </h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                <input
+                                    type="date"
+                                    value={novoTrade.data}
+                                    onChange={(e) => setNovoTrade({ ...novoTrade, data: e.target.value })}
+                                    className="border p-2 rounded bg-white dark:bg-gray-700 text-black dark:text-white"
+                                    placeholder="Data"
+                                />
+                                <input
+                                    type="text"
+                                    placeholder="Ativo (ex: XAU/USD)"
+                                    value={novoTrade.ativo}
+                                    onChange={(e) => setNovoTrade({ ...novoTrade, ativo: e.target.value })}
+                                    className="border p-2 rounded bg-white dark:bg-gray-700 text-black dark:text-white"
+                                />
+                                <select
+                                    value={novoTrade.resultado}
+                                    onChange={(e) => setNovoTrade({ ...novoTrade, resultado: e.target.value })}
+                                    className="border p-2 rounded bg-white dark:bg-gray-700 text-black dark:text-white"
+                                >
+                                    <option value="Win">Win</option>
+                                    <option value="Loss">Loss</option>
+                                    <option value="Breakeven">Breakeven</option>
+                                </select>
+                                <input
+                                    type="number"
+                                    placeholder="Resultado Financeiro (ex: 100.50)"
+                                    value={novoTrade.valor}
+                                    onChange={(e) => setNovoTrade({ ...novoTrade, valor: e.target.value })}
+                                    className="border p-2 rounded bg-white dark:bg-gray-700 text-black dark:text-white"
+                                />
+                            </div>
+                            <textarea
+                                placeholder="Comentários gerais sobre a operação"
+                                value={novoTrade.comentario}
+                                onChange={(e) => setNovoTrade({ ...novoTrade, comentario: e.target.value })}
+                                className="border p-2 rounded w-full mb-6 bg-white dark:bg-gray-700 text-black dark:text-white"
+                            />
+                            {/* Inputs para até 5 imagens e seus comentários */}
+                            <h3 className="text-lg font-semibold mb-4 text-gray-700 dark:text-gray-200">
+                                Imagens e Comentários
+                            </h3>
+                            <div className="space-y-4">
+                                {novoTrade.imagens.map((imagem, index) => (
+                                    <div
+                                        key={index}
+                                        className="border rounded-lg p-4 bg-gray-100 dark:bg-gray-700 text-black dark:text-white shadow-sm"
+                                    >
+                                        <div className="mb-3">
+                                            <input
+                                                type="text"
+                                                placeholder={`URL da Imagem ${index + 1}`}
+                                                value={imagem.url}
+                                                onChange={(e) => handleImageChange(index, "url", e.target.value)}
+                                                className="border p-2 rounded w-full bg-white dark:bg-gray-800 text-black dark:text-white"
+                                            />
+                                        </div>
+                                        <textarea
+                                            placeholder={`Comentário da Imagem ${index + 1}`}
+                                            value={imagem.comment}
+                                            onChange={(e) => handleImageChange(index, "comment", e.target.value)}
+                                            className="border p-2 rounded w-full bg-white dark:bg-gray-800 text-black dark:text-white"
+                                        />
+                                        <div className="flex justify-end mt-3">
+                                            <button
+                                                onClick={() => {
+                                                    const novasImagens = novoTrade.imagens.filter(
+                                                        (_, i) => i !== index
+                                                    );
+                                                    setNovoTrade({ ...novoTrade, imagens: novasImagens });
+                                                }}
+                                                className="text-red-500 hover:text-red-700 text-sm"
+                                            >
+                                                Remover
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Botões */}
+                            <div className="flex justify-end gap-2 mt-6">
+                                <button
+                                    onClick={() => {
+                                        setShowModal(false);
+                                        setEditingIndex(null);
+                                        setNovoTrade({
+                                            data: '',
+                                            ativo: "",
+                                            resultado: "Win",
+                                            valor: "",
+                                            comentario: "",
+                                            imagens: [
+                                                { url: "", comment: "" },
+                                                { url: "", comment: "" },
+                                                { url: "", comment: "" },
+                                                { url: "", comment: "" },
+                                                { url: "", comment: "" },
+                                            ],
+                                        });
+                                    }}
+                                    className="bg-gray-300 dark:bg-gray-500 text-gray-700 dark:text-gray-300 px-4 py-2 rounded hover:bg-gray-400 dark:hover:bg-gray-600 w-24"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    onClick={adicionarTrade}
+                                    className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 w-24"
+                                >
+                                    {editingIndex !== null ? "Salvar Edição" : "Salvar"}
+                                </button>
+                            </div>
                         </div>
                     </div>
-                ))}
+                )}
             </div>
 
-            {/* Botões */}
-            <div className="flex justify-end gap-2 mt-6">
-                <button
-                    onClick={() => {
-                        setShowModal(false);
-                        setEditingIndex(null);
-                        setNovoTrade({
-                            data: '',
-                            ativo: "",
-                            resultado: "Win",
-                            valor: "",
-                            comentario: "",
-                            imagens: [
-                                { url: "", comment: "" },
-                                { url: "", comment: "" },
-                                { url: "", comment: "" },
-                                { url: "", comment: "" },
-                                { url: "", comment: "" },
-                            ],
-                        });
-                    }}
-                    className="bg-gray-300 dark:bg-gray-500 text-gray-700 dark:text-gray-300 px-4 py-2 rounded hover:bg-gray-400 dark:hover:bg-gray-600 w-24"
-                >
-                    Cancelar
-                </button>
-                <button
-                    onClick={adicionarTrade}
-                    className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 w-24"
-                >
-                    {editingIndex !== null ? "Salvar Edição" : "Salvar"}
-                </button>
-            </div>
+
+
         </div>
-    </div>
-)}
-        </div>
-        
-        
-    
-        </div>   
     );
 }
 
