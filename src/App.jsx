@@ -92,12 +92,20 @@ function App() {
         const savedTheme = localStorage.getItem('darkMode');
         if (savedTheme === 'true') {
             setDarkMode(true);
+            document.documentElement.classList.add('dark');
+        } else {
+            setDarkMode(false);
+            document.documentElement.classList.remove('dark');
         }
     }, []);
 
     // Aplicar modo escuro e salvar no localStorage
     useEffect(() => {
-        document.documentElement.classList.toggle('dark', darkMode);
+        if (darkMode) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
         localStorage.setItem('darkMode', String(darkMode));
     }, [darkMode]);
 
@@ -239,6 +247,7 @@ function App() {
             <div className="w-full max-w-screen-xl">
                 <h1 className="text-3xl font-bold mb-6 text-center text-gray-800 dark:text-gray-100">Diário de Trade</h1>
                 <div className="flex justify-end mb-4">
+
                     <button 
                         onClick={handleLogout}
                         className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
