@@ -32,14 +32,25 @@ function App() {
 
 
     // Função para remover uma tarefa em uma seção específica
-    const handleToggleComplete = (index) => {
-        const updatedChecklist = [...checklist];
-        updatedChecklist[index].completed = !updatedChecklist[index].completed;
+    const handleToggleComplete = (section, index) => {
+        // Faz uma cópia do checklist atual
+        const updatedChecklist = { ...checklist };
+    
+        // Atualiza o item específico dentro da seção
+        updatedChecklist[section][index].completed = !updatedChecklist[section][index].completed;
+    
+        // Atualiza o estado do checklist
         setChecklist(updatedChecklist);
     };
 
-    const handleRemoveTask = (index) => {
-        const updatedChecklist = checklist.filter((_, i) => i !== index);
+    const handleRemoveTask = (section, index) => {
+        // Faz uma cópia do checklist atual
+        const updatedChecklist = { ...checklist };
+    
+        // Remove o item específico da seção
+        updatedChecklist[section] = updatedChecklist[section].filter((_, i) => i !== index);
+    
+        // Atualiza o estado do checklist
         setChecklist(updatedChecklist);
     };
     const tradesSectionRef = React.createRef();
@@ -289,7 +300,7 @@ function App() {
                                                     <input
                                                         type="checkbox"
                                                         checked={item.completed}
-                                                        onChange={() => handleToggleComplete(section, index)}
+                                                        onChange={() => handleToggleComplete(section, index)} // Passa a seção e o índice
                                                         className="form-checkbox h-5 w-5 text-blue-600"
                                                     />
                                                     <span
@@ -301,7 +312,7 @@ function App() {
                                                     </span>
                                                 </label>
                                                 <button
-                                                    onClick={() => handleRemoveTask(section, index)}
+                                                    onClick={() => handleRemoveTask(section, index)} // Passa a seção e o índice
                                                     className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
                                                 >
                                                     Remover
