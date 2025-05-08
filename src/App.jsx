@@ -379,6 +379,8 @@ function App() {
                         })}
                     </div>
                 </div>
+
+
                 {/* Seção de Trades Cadastrados */}
                 <div className="bg-white dark:bg-gray-800 border rounded p-4 mt-6">
                     <h2 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">Trades Cadastrados</h2>
@@ -398,7 +400,7 @@ function App() {
                             </thead>
                             <tbody>
                                 {trades.map((trade, index) => (
-                                    <tr key={index} className="hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    <tr key={index} className={`hover:bg-gray-100 dark:hover:bg-gray-700 ${index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-800' : ''}`}>
                                         <td className="p-2 border dark:border-gray-600">{trade.data}</td>
                                         <td className="p-2 border dark:border-gray-600">{trade.ativo || "N/A"}</td>
                                         <td
@@ -418,20 +420,39 @@ function App() {
                                                 <div className="space-y-2">
                                                     {trade.imagens.map((imagem, imgIndex) => (
                                                         <div key={imgIndex} className="mb-2">
-                                                            {imagem.url && (
+                                                            {imagem.url ? (
                                                                 <a
                                                                     href={imagem.url}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
-                                                                    className="text-blue-500 hover:underline"
+                                                                    className="block w-20 h-20 bg-gray-100 dark:bg-gray-700 rounded overflow-hidden hover:opacity-90"
                                                                 >
-                                                                    Imagem {imgIndex + 1}
+                                                                    <img
+                                                                        src={imagem.url}
+                                                                        alt={`Imagem ${imgIndex + 1}`}
+                                                                        className="w-full h-full object-cover"
+                                                                        onError={(e) => {
+                                                                            e.target.onerror = null; // Remove o evento para evitar loop infinito
+                                                                            e.target.src = "https://via.placeholder.com/100x100?text=Imagem+Indisponível"; // Fallback
+                                                                        }}
+                                                                    />
                                                                 </a>
+                                                            ) : (
+                                                                <img
+                                                                    src="https://via.placeholder.com/100x100?text=Sem+Imagem"
+                                                                    alt="Sem Imagem"
+                                                                    className="w-20 h-20 bg-gray-200 dark:bg-gray-600 rounded"
+                                                                />
                                                             )}
                                                             {imagem.comment && (
-                                                                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                                                    {imagem.comment}
-                                                                </p>
+                                                                <details className="mt-1">
+                                                                    <summary className="text-blue-500 hover:underline cursor-pointer text-sm">
+                                                                        Ver comentário
+                                                                    </summary>
+                                                                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                                                        {imagem.comment}
+                                                                    </p>
+                                                                </details>
                                                             )}
                                                         </div>
                                                     ))}
@@ -444,14 +465,16 @@ function App() {
                                             <button
                                                 onClick={() => editarTrade(index)}
                                                 className="text-blue-500 hover:underline mr-2"
+                                                title="Editar este trade"
                                             >
-                                                Editar
+                                                ✏️
                                             </button>
                                             <button
                                                 onClick={() => removerTrade(index)}
                                                 className="text-red-500 hover:underline"
+                                                title="Remover este trade"
                                             >
-                                                Remover
+                                                🗑️
                                             </button>
                                         </td>
                                     </tr>
@@ -737,10 +760,10 @@ function App() {
     </div>
 )}
         </div>
-            </div>
+        
         
     
-            
+        </div>   
     );
 }
 
