@@ -379,7 +379,87 @@ function App() {
                         })}
                     </div>
                 </div>
-
+                {/* Seção de Trades Cadastrados */}
+                <div className="bg-white dark:bg-gray-800 border rounded p-4 mt-6">
+                    <h2 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">Trades Cadastrados</h2>
+                    {trades.length === 0 ? (
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Nenhum trade cadastrado ainda.</p>
+                    ) : (
+                        <table className="w-full border-collapse">
+                            <thead>
+                                <tr className="text-left bg-gray-100 dark:bg-gray-700">
+                                    <th className="p-2 border dark:border-gray-600">Data</th>
+                                    <th className="p-2 border dark:border-gray-600">Ativo</th>
+                                    <th className="p-2 border dark:border-gray-600">Resultado</th>
+                                    <th className="p-2 border dark:border-gray-600">Valor</th>
+                                    <th className="p-2 border dark:border-gray-600">Imagens e Comentários</th>
+                                    <th className="p-2 border dark:border-gray-600">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {trades.map((trade, index) => (
+                                    <tr key={index} className="hover:bg-gray-100 dark:hover:bg-gray-700">
+                                        <td className="p-2 border dark:border-gray-600">{trade.data}</td>
+                                        <td className="p-2 border dark:border-gray-600">{trade.ativo || "N/A"}</td>
+                                        <td
+                                            className={`p-2 border dark:border-gray-600 ${
+                                                trade.resultado === "Win"
+                                                    ? "text-green-500"
+                                                    : trade.resultado === "Loss"
+                                                    ? "text-red-500"
+                                                    : "text-yellow-500"
+                                            }`}
+                                        >
+                                            {trade.resultado}
+                                        </td>
+                                        <td className="p-2 border dark:border-gray-600">{`${moeda}${trade.valor.toFixed(2)}`}</td>
+                                        <td className="p-2 border dark:border-gray-600">
+                                            {trade.imagens && trade.imagens.length > 0 ? (
+                                                <div className="space-y-2">
+                                                    {trade.imagens.map((imagem, imgIndex) => (
+                                                        <div key={imgIndex} className="mb-2">
+                                                            {imagem.url && (
+                                                                <a
+                                                                    href={imagem.url}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="text-blue-500 hover:underline"
+                                                                >
+                                                                    Imagem {imgIndex + 1}
+                                                                </a>
+                                                            )}
+                                                            {imagem.comment && (
+                                                                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                                                    {imagem.comment}
+                                                                </p>
+                                                            )}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <p className="text-sm text-gray-600 dark:text-gray-400">Nenhuma imagem ou comentário.</p>
+                                            )}
+                                        </td>
+                                        <td className="p-2 border dark:border-gray-600">
+                                            <button
+                                                onClick={() => editarTrade(index)}
+                                                className="text-blue-500 hover:underline mr-2"
+                                            >
+                                                Editar
+                                            </button>
+                                            <button
+                                                onClick={() => removerTrade(index)}
+                                                className="text-red-500 hover:underline"
+                                            >
+                                                Remover
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
+                </div>
                 {showModal && (
                     <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
                         <div className="bg-white dark:bg-gray-800 p-6 rounded shadow-lg w-full max-w-md relative">
