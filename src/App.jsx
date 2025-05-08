@@ -429,11 +429,11 @@ function App() {
                                                     {`${moeda}${trade.valor.toFixed(2)}`}
                                                 </td>
                                                 <td className="p-2 border dark:border-gray-600">
-                                                    {/* Imagens e Comentários */}
-                                                    {trade.imagens && trade.imagens.length > 0 ? (
-                                                        <div className="flex space-x-2 overflow-x-scroll">
-                                                            {trade.imagens.map(
-                                                                (imagem, imgIndex) => (
+                                                    {/* Imagens */}
+                                                    <div className="flex space-x-2 overflow-x-scroll">
+                                                        {trade.imagens && trade.imagens.length > 0 ? (
+                                                            trade.imagens.map((imagem, imgIndex) => (
+                                                                imagem.url ? (
                                                                     <a
                                                                         key={imgIndex}
                                                                         href={imagem.url}
@@ -445,29 +445,30 @@ function App() {
                                                                             src={imagem.url}
                                                                             alt={`Imagem ${imgIndex + 1}`}
                                                                             className="w-full h-full object-cover"
-                                                                            onError={(e) => {
-                                                                                e.target.onerror =
-                                                                                    null; // Remove o evento para evitar loop infinito
-                                                                                e.target.src =
-                                                                                    "https://via.placeholder.com/50x50?text=Indisponível"; // Fallback estático
-                                                                            }}
                                                                         />
                                                                     </a>
+                                                                ) : (
+                                                                    <div
+                                                                        key={imgIndex}
+                                                                        className="w-12 h-12 bg-gray-200 dark:bg-gray-600 rounded flex items-center justify-center text-xs text-gray-500 dark:text-gray-400"
+                                                                    >
+                                                                        N/A
+                                                                    </div>
                                                                 )
-                                                            )}
-                                                        </div>
-                                                    ) : (
-                                                        <div className="flex items-center space-x-2">
-                                                            {[...Array(5)].map((_, i) => (
-                                                                <div
-                                                                    key={i}
-                                                                    className="w-12 h-12 bg-gray-200 dark:bg-gray-600 rounded flex items-center justify-center text-xs text-gray-500 dark:text-gray-400"
-                                                                >
-                                                                    N/A
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    )}
+                                                            ))
+                                                        ) : (
+                                                            <div className="flex items-center space-x-2">
+                                                                {[...Array(5)].map((_, i) => (
+                                                                    <div
+                                                                        key={i}
+                                                                        className="w-12 h-12 bg-gray-200 dark:bg-gray-600 rounded flex items-center justify-center text-xs text-gray-500 dark:text-gray-400"
+                                                                    >
+                                                                        N/A
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                     {/* Comentários */}
                                                     {trade.imagens.map((imagem, imgIndex) => (
                                                         <div key={imgIndex} className="mt-2">
