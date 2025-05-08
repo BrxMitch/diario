@@ -135,6 +135,13 @@ function App() {
     const mediaPorOperacao = totalOperacoes ? (resultadoFinal / totalOperacoes).toFixed(2) : 0;
     const taxaAcerto = totalOperacoes ? ((resumoMes.Win / totalOperacoes) * 100).toFixed(1) : 0;
 
+    // Função para atualizar URLs e comentários das imagens
+    const handleImageChange = (index, field, value) => {
+        const updatedImages = [...novoTrade.imagens];
+        updatedImages[index][field] = value; // Atualiza o campo (url ou comment) no índice especificado
+        setNovoTrade({ ...novoTrade, imagens: updatedImages }); // Atualiza o estado de novoTrade
+    };
+
     const pieData = {
         labels: ['Win', 'Loss', 'Breakeven'],
         datasets: [{
