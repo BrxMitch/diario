@@ -506,77 +506,156 @@ function App() {
                     </div>
                 )}
 
-{modalDia && (
+{showModal && (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
-        <div className="bg-gray-800 text-white p-6 rounded shadow-lg max-w-md w-full relative">
+        <div
+            className="bg-white dark:bg-gray-800 p-6 rounded shadow-lg w-full max-w-md relative overflow-y-auto"
+            style={{
+                maxHeight: "90vh", // Limita a altura máxima para 90% da altura da viewport
+            }}
+        >
             {/* Botão para fechar o modal */}
-            <button onClick={() => setModalDia(null)} className="absolute top-2 right-3 text-gray-400 hover:text-white">
+            <button
+                onClick={() => {
+                    setShowModal(false);
+                    setEditingIndex(null);
+                    setNovoTrade({
+                        data: '',
+                        ativo: "",
+                        resultado: "Win",
+                        valor: "",
+                        comentario: "",
+                        imagens: [
+                            { url: "", comment: "" },
+                            { url: "", comment: "" },
+                            { url: "", comment: "" },
+                            { url: "", comment: "" },
+                            { url: "", comment: "" },
+                        ],
+                    });
+                }}
+                className="absolute top-2 right-3 text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white"
+            >
                 &times;
             </button>
-
-            {/* Título do modal */}
-            <h2 className="text-lg font-bold mb-4">{`Trades do dia ${modalDia.dia}`}</h2>
-
-            {/* Loop para exibir os trades do dia */}
-            {modalDia.doDia.length === 0 ? (
-                <p className="text-sm text-gray-400">Nenhuma operação registrada nesse dia.</p>
-            ) : (
-                modalDia.doDia.map((trade, index) => (
-                    <div key={index} className="bg-gray-700 p-4 rounded mb-4">
-                        {/* Exibição do ativo, resultado e valor */}
-                        <h3
-                            className={`font-bold ${
-                                trade.resultado === "Win"
-                                    ? "text-green-400"
-                                    : trade.resultado === "Loss"
-                                    ? "text-red-400"
-                                    : "text-yellow-400"
-                            }`}
-                        >
-                            {`${trade.ativo || "Ativo Desconhecido"} - ${trade.resultado} - ${trade.valor >= 0 ? "+" : ""}$${trade.valor}`}
-                        </h3>
-                        {/* Comentário opcional */}
-                        {trade.comentario && (
-                            <p className="text-sm text-gray-400 italic mt-2">{trade.comentario}</p>
-                        )}
-                        {/* Imagem do trade com efeito de zoom no hover */}
-                        {trade.imagem && (
-                            <div className="mt-4">
-                                <img
-                                    src={trade.imagem}
-                                    alt="Gráfico do Trade"
-                                    className="rounded trade-image cursor-pointer"
-                                    style={{ width: "100%", height: "auto" }}
-                                    onClick={() => {
-                                        // Abrir a imagem em tela cheia
-                                        const newWindow = window.open(trade.imagem, '_blank');
-                                        if (newWindow) newWindow.focus();
-                                    }}
-                                />
-                            </div>
-                        )}
-
-                        {/* Botões de ação (Editar e Remover) */}
-                        <div className="flex justify-between mt-4">
+            <h2 className="text-lg font-bold mb-4">
+                {editingIndex !== null ? "Editar Operação" : "Registrar Operação"}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <input
+                    type="date"
+                    value={novoTrade.data}
+                    onChange={(e) => setNovoTrade({ ...novoTrade, data: e.target.value })}
+                    className="border p-2 rounded bg-white dark:bg-gray-700 text-black dark:text-white"
+                    placeholder="Data"
+                />
+                <input
+                    type="text"
+                    placeholder="Ativo (ex: XAU/USD)"
+                    value={novoTrade.ativo}
+                    onChange={(e) => setNovoTrade({ ...novoTrade, ativo: e.target.value })}
+                    className="border p-2 rounded bg-white dark:bg-gray-700 text-black dark:text-white"
+                />
+                <select
+                    value={novoTrade.resultado}
+                    onChange={(e) => setNovoTrade({ ...novoTrade, resultado: e.target.value })}
+                    className="border p-2 rounded bg-white dark:bg-gray-700 text-black dark:text-white"
+                >
+                    <option value="Win">Win</option>
+                    <option value="Loss">Loss</option>
+                    <option value="Breakeven">Breakeven</option>
+                </select>
+                <input
+                    type="number"
+                    placeholder="Resultado Financeiro (ex: 100.50)"
+                    value={novoTrade.valor}
+                    onChange={(e) => setNovoTrade({ ...novoTrade, valor: e.target.value })}
+                    className="border p-2 rounded bg-white dark:bg-gray-700 text-black dark:text-white"
+                />
+            </div>
+            <textarea
+                placeholder="Comentários gerais sobre a operação"
+                value={novoTrade.comentario}
+                onChange={(e) => setNovoTrade({ ...novoTrade, comentario: e.target.value })}
+                className="border p-2 rounded w-full mb-6 bg-white dark:bg-gray-700 text-black dark:text-white"
+            />
+            {/* Inputs para até 5 imagens e seus comentários */}
+            <h3 className="text-lg font-semibold mb-4 text-gray-700 dark:text-gray-200">
+                Imagens e Comentários
+            </h3>
+            <div className="space-y-4">
+                {novoTrade.imagens.map((imagem, index) => (
+                    <div
+                        key={index}
+                        className="border rounded-lg p-4 bg-gray-100 dark:bg-gray-700 text-black dark:text-white shadow-sm"
+                    >
+                        <div className="mb-3">
+                            <input
+                                type="text"
+                                placeholder={`URL da Imagem ${index + 1}`}
+                                value={imagem.url}
+                                onChange={(e) => handleImageChange(index, "url", e.target.value)}
+                                className="border p-2 rounded w-full bg-white dark:bg-gray-800 text-black dark:text-white"
+                            />
+                        </div>
+                        <textarea
+                            placeholder={`Comentário da Imagem ${index + 1}`}
+                            value={imagem.comment}
+                            onChange={(e) => handleImageChange(index, "comment", e.target.value)}
+                            className="border p-2 rounded w-full bg-white dark:bg-gray-800 text-black dark:text-white"
+                        />
+                        <div className="flex justify-end mt-3">
                             <button
-                                onClick={() => editarTrade(index)}
-                                className="text-blue-400 hover:text-blue-300 text-sm"
+                                onClick={() => {
+                                    const novasImagens = novoTrade.imagens.filter(
+                                        (_, i) => i !== index
+                                    );
+                                    setNovoTrade({ ...novoTrade, imagens: novasImagens });
+                                }}
+                                className="text-red-500 hover:text-red-700 text-sm"
                             >
-                                ✏️ Editar
-                            </button>
-                            <button
-                                onClick={() => removerTrade(index)}
-                                className="text-red-400 hover:text-red-300 text-sm"
-                            >
-                                🗑️ Remover
+                                Remover
                             </button>
                         </div>
                     </div>
-                ))
-            )}
+                ))}
+            </div>
+
+            {/* Botões */}
+            <div className="flex justify-end gap-2 mt-6">
+                <button
+                    onClick={() => {
+                        setShowModal(false);
+                        setEditingIndex(null);
+                        setNovoTrade({
+                            data: '',
+                            ativo: "",
+                            resultado: "Win",
+                            valor: "",
+                            comentario: "",
+                            imagens: [
+                                { url: "", comment: "" },
+                                { url: "", comment: "" },
+                                { url: "", comment: "" },
+                                { url: "", comment: "" },
+                                { url: "", comment: "" },
+                            ],
+                        });
+                    }}
+                    className="bg-gray-300 dark:bg-gray-500 text-gray-700 dark:text-gray-300 px-4 py-2 rounded hover:bg-gray-400 dark:hover:bg-gray-600 w-24"
+                >
+                    Cancelar
+                </button>
+                <button
+                    onClick={adicionarTrade}
+                    className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 w-24"
+                >
+                    {editingIndex !== null ? "Salvar Edição" : "Salvar"}
+                </button>
+            </div>
         </div>
     </div>
-    )}
+)}
         </div>
             </div>
         
