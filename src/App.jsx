@@ -243,9 +243,9 @@ function App() {
 
 
     return (
-        <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-black dark:text-white p-6 relative flex justify-center">
+        <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-black dark:text-white p-4 sm:p-6 relative flex justify-center">
             <div className="w-full max-w-screen-xl">
-                <h1 className="text-3xl font-bold mb-6 text-center text-gray-800 dark:text-gray-100">Diário de Trade</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-center text-gray-800 dark:text-gray-100">Diário de Trade</h1>
                 <div className="flex justify-end mb-4">
 
                     <button 
@@ -268,13 +268,13 @@ function App() {
 
                 {/* Checklist Operacional */}
                 {showChecklist && (
-                    <div className="fixed bottom-16 right-4 bg-white dark:bg-gray-800 border rounded-lg shadow-lg w-96 p-4">
+                    <div className="fixed bottom-16 right-4 bg-white dark:bg-gray-800 border rounded-lg shadow-lg w-full sm:w-96 p-4">
                         <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">
                             Checklist Operacional
                         </h3>
 
                         {/* Área rolável com altura fixa */}
-                        <div className="h-[600px] overflow-y-auto">
+                        <div className="h-80 sm:h-[600px] overflow-y-auto">
                             {/* Renderizar seções do checklist */}
                             {Object.entries(checklist).map(([section, tasks]) => (
                                 <div key={section} className="mb-6">
@@ -332,11 +332,12 @@ function App() {
                     </div>
                 )}
 
-                <div className="flex justify-end items-center gap-4 mb-4">
+                {/* Botões principais */}
+                <div className="flex flex-wrap justify-end items-center gap-2 sm:gap-4 mb-4">
                     <button
                         onClick={() => setDarkMode(prev => !prev)}
                         className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
-                        title={darkMode ? "Light Mode" : "Dark Mode"}
+                        title={darkMode ? "Modo Claro" : "Modo Escuro"}
                     >
                         {darkMode ? <Sun size={20} /> : <Moon size={20} />}
                     </button>
@@ -361,6 +362,7 @@ function App() {
                         <PlusCircle size={18} /> Nova Operação
                     </button>
                 </div>
+
                 <div className="mb-4 flex items-center gap-4">
                     <label className="mr-2 font-semibold">Moeda:</label>
                     <select value={moeda} onChange={e => setMoeda(e.target.value)} className="border rounded px-2 py-1 bg-white dark:bg-gray-800 text-black dark:text-white">
@@ -381,6 +383,8 @@ function App() {
                         <option value="Breakeven">Breakeven</option>
                     </select>
                 </div>
+
+                {/* Resumo*/}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                     <div className="bg-white dark:bg-gray-800 border rounded p-4">
                         <h2 className="text-lg font-semibold mb-2">Resumo da Semana</h2>
@@ -396,12 +400,12 @@ function App() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div className="ggrid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                     <div className="bg-white dark:bg-gray-800 border rounded p-4">
                         <h3 className="font-semibold mb-1">Total de Operações</h3>
                         <p className="text-xl font-bold">{totalOperacoes}</p>
                     </div>
-                    <div className="bg-white dark:bg-gray-800 border rounded p-4">
+                    <div className="bbg-white dark:bg-gray-800 border rounded p-4">
                         <h3 className="font-semibold mb-1">Taxa de Acerto</h3>
                         <p className="text-xl font-bold">{taxaAcerto}%</p>
                         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
@@ -518,7 +522,7 @@ function App() {
 
 
                 {/* Seção de Trades Cadastrados */}
-                <div ref={tradesSectionRef} className="bg-white dark:bg-gray-800 border rounded p-4 mt-6">
+                <div ref={tradesSectionRef} className="bg-white dark:bg-gray-800 border rounded p-4 mt-6 overflow-x-auto">
                     <h2 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">Trades Cadastrados</h2>
                     {trades.length === 0 ? (
                         <p className="text-sm text-gray-600 dark:text-gray-400">Nenhum trade cadastrado ainda.</p>
