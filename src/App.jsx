@@ -416,38 +416,58 @@ function App() {
                                         </td>
                                         <td className="p-2 border dark:border-gray-600">{`${moeda}${trade.valor.toFixed(2)}`}</td>
                                         <td className="p-2 border dark:border-gray-600">
-                                            {trade.imagens && trade.imagens.length > 0 ? (
-                                                <div className="space-y-2">
-                                                    {trade.imagens.map((imagem, imgIndex) => (
-                                                        <div key={imgIndex} className="mb-2">
-                                                            {imagem.url ? (
-                                                                <a
-                                                                    href={imagem.url}
-                                                                    target="_blank"
-                                                                    rel="noopener noreferrer"
-                                                                    className="block w-20 h-20 bg-gray-100 dark:bg-gray-700 rounded overflow-hidden hover:opacity-90"
-                                                                >
-                                                                    <img
-                                                                        src={imagem.url}
-                                                                        alt={`Imagem ${imgIndex + 1}`}
-                                                                        className="w-full h-full object-cover"
-                                                                        onError={(e) => {
-                                                                            e.target.onerror = null; // Remove o evento para evitar loop infinito
-                                                                            e.target.src = "https://via.placeholder.com/100x100?text=Imagem+Indisponível"; // Fallback
-                                                                        }}
-                                                                    />
-                                                                </a>
-                                                            ) : (
+                                            {/* Tab Navigation */}
+                                            <div>
+                                                <div className="flex space-x-4 mb-2">
+                                                    <button
+                                                        className="text-blue-500 hover:underline"
+                                                        onClick={() => document.getElementById(`tab-images-${index}`).classList.remove('hidden')}
+                                                    >
+                                                        Imagens
+                                                    </button>
+                                                    <button
+                                                        className="text-blue-500 hover:underline"
+                                                        onClick={() => document.getElementById(`tab-images-${index}`).classList.add('hidden')}
+                                                    >
+                                                        Comentários
+                                                    </button>
+                                                </div>
+
+                                                {/* Imagens */}
+                                                <div id={`tab-images-${index}`} className="flex space-x-2 overflow-x-scroll">
+                                                    {trade.imagens && trade.imagens.length > 0 ? (
+                                                        trade.imagens.map((imagem, imgIndex) => (
+                                                            <a
+                                                                key={imgIndex}
+                                                                href={imagem.url}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="block w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded overflow-hidden hover:opacity-90"
+                                                            >
                                                                 <img
-                                                                    src="https://via.placeholder.com/100x100?text=Sem+Imagem"
-                                                                    alt="Sem Imagem"
-                                                                    className="w-20 h-20 bg-gray-200 dark:bg-gray-600 rounded"
+                                                                    src={imagem.url}
+                                                                    alt={`Imagem ${imgIndex + 1}`}
+                                                                    className="w-full h-full object-cover"
+                                                                    onError={(e) => {
+                                                                        e.target.onerror = null;
+                                                                        e.target.src = "https://via.placeholder.com/50x50?text=Indisponível";
+                                                                    }}
                                                                 />
-                                                            )}
+                                                            </a>
+                                                        ))
+                                                    ) : (
+                                                        <p className="text-sm text-gray-600 dark:text-gray-400">Nenhuma imagem.</p>
+                                                    )}
+                                                </div>
+
+                                                {/* Comentários */}
+                                                <div id={`tab-comments-${index}`} className="hidden">
+                                                    {trade.imagens.map((imagem, imgIndex) => (
+                                                        <div key={imgIndex}>
                                                             {imagem.comment && (
                                                                 <details className="mt-1">
                                                                     <summary className="text-blue-500 hover:underline cursor-pointer text-sm">
-                                                                        Ver comentário
+                                                                        Ver comentário {imgIndex + 1}
                                                                     </summary>
                                                                     <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                                                                         {imagem.comment}
@@ -457,9 +477,7 @@ function App() {
                                                         </div>
                                                     ))}
                                                 </div>
-                                            ) : (
-                                                <p className="text-sm text-gray-600 dark:text-gray-400">Nenhuma imagem ou comentário.</p>
-                                            )}
+                                            </div>
                                         </td>
                                         <td className="p-2 border dark:border-gray-600">
                                             <button
