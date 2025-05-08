@@ -411,24 +411,24 @@ function App() {
                     </div>
                 </div>
 
-                <div className="ggrid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                     <div className="bg-white dark:bg-gray-800 border rounded p-4">
                         <h3 className="font-semibold mb-1">Total de Operações</h3>
                         <p className="text-xl font-bold">{totalOperacoes}</p>
                     </div>
-                    <div className="bbg-white dark:bg-gray-800 border rounded p-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                         <h3 className="font-semibold mb-1">Taxa de Acerto</h3>
                         <p className="text-xl font-bold">{taxaAcerto}%</p>
                         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
                             <div className="bg-green-500 h-2 rounded-full" style={{ width: `${taxaAcerto}%` }}></div>
                         </div>
                     </div>
-                    <div className="bg-white dark:bg-gray-800 border rounded p-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                         <h3 className="font-semibold mb-1">Resultado</h3>
                         <p className="text-xl font-bold text-green-600 dark:text-green-400">{`${moeda}${resultadoFinal.toFixed(2)}`}</p>
                         <p className="text-sm text-gray-600 dark:text-gray-400">Ganhos: {`${moeda}${ganhos.toFixed(2)}`} • Perdas: {`${moeda}${perdas.toFixed(2)}`}</p>
                     </div>
-                    <div className="bg-white dark:bg-gray-800 border rounded p-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                         <h3 className="font-semibold mb-1">Média por Operação</h3>
                         <p className="text-xl font-bold">{`${moeda}${mediaPorOperacao}`}</p>
                     </div>
