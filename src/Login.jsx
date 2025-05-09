@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import supabase from './supabaseClient'; // Importa o cliente do Supabase
 
 function Login({ onLogin }) {
     const [email, setEmail] = useState('');
@@ -13,151 +14,75 @@ function Login({ onLogin }) {
     const [resetError, setResetError] = useState('');
     const [resetSuccess, setResetSuccess] = useState('');
 
-    useEffect(() => {
-        const request = indexedDB.open('UserDB', 1);
+    // Função para cadastro de usuário
+    const handleRegister = async () => {
+        const { data, error } = await supabase.from('users').insert([{ email, password }]);
 
-        request.onupgradeneeded = (event) => {
-            const db = event.target.result;
+        if (error) {
+            setError('Erro ao cadastrar o usuário: ' + error.message);
+            return;
+        }
+        alert('Usuário cadastrado com sucesso!');
+        setIsRegistering(false); // Voltar para login
+        setEmail('');
+        setPassword('');
+    };
 
-            if (!db.objectStoreNames.contains('users')) {
-                db.createObjectStore('users', { keyPath: 'email' });
-            }
-        };
+    // Função para login de usuário
+    const handleLogin = async () => {
+        const { data, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('email', email)
+            .eq('password', password)
+            .single();
 
-        request.onerror = () => {
-            console.error('Erro ao abrir o IndexedDB');
-        };
-
-        request.onsuccess = () => {
-            console.log('IndexedDB configurado com sucesso!');
-        };
-    }, []);
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        setError('');
-
-        if (!email || !password) {
-            setError('Por favor, preencha todos os campos.');
+        if (error || !data) {
+            setError('Email ou senha inválidos.');
             return;
         }
 
-        if (isRegistering) {
-            // Lógica de cadastro
-            const newUser = { email, password };
-
-            const request = indexedDB.open('UserDB', 1);
-
-            request.onsuccess = (event) => {
-                const db = event.target.result;
-                const transaction = db.transaction('users', 'readwrite');
-                const store = transaction.objectStore('users');
-
-                const addRequest = store.add(newUser);
-
-                addRequest.onsuccess = () => {
-                    alert('Usuário cadastrado com sucesso!');
-                    setIsRegistering(false); // Voltar para login após o cadastro
-                    setEmail('');
-                    setPassword('');
-                };
-
-                addRequest.onerror = () => {
-                    setError('Erro: Este email já está cadastrado.');
-                };
-            };
-
-            request.onerror = () => {
-                console.error('Erro ao conectar ao IndexedDB');
-                setError('Erro ao cadastrar o usuário.');
-            };
-        } else {
-            // Lógica de login
-            setLoading(true);
-
-            const request = indexedDB.open('UserDB', 1);
-
-            request.onsuccess = (event) => {
-                const db = event.target.result;
-                const transaction = db.transaction('users', 'readonly');
-                const store = transaction.objectStore('users');
-
-                const getRequest = store.get(email);
-
-                getRequest.onsuccess = () => {
-                    const user = getRequest.result;
-
-                    if (user && user.password === password) {
-                        setError('');
-                        onLogin();
-                    } else {
-                        setError('Email ou senha inválidos.');
-                    }
-                    setLoading(false);
-                };
-
-                getRequest.onerror = () => {
-                    console.error('Erro ao buscar usuário no IndexedDB');
-                    setError('Erro ao validar o login.');
-                    setLoading(false);
-                };
-            };
-
-            request.onerror = () => {
-                console.error('Erro ao conectar ao IndexedDB');
-                setError('Erro ao conectar ao banco de dados.');
-                setLoading(false);
-            };
-        }
+        onLogin(); // Chama a função passada como prop para indicar sucesso no login
     };
 
-    const handleResetPassword = () => {
-        setResetError('');
-        setResetSuccess('');
-
+    // Função para redefinir senha
+    const handleResetPassword = async () => {
         if (!resetEmail || !newPassword) {
             setResetError('Por favor, preencha todos os campos.');
             return;
         }
 
-        const request = indexedDB.open('UserDB', 1);
+        const { data, error } = await supabase
+            .from('users')
+            .update({ password: newPassword })
+            .eq('email', resetEmail);
 
-        request.onsuccess = (event) => {
-            const db = event.target.result;
-            const transaction = db.transaction('users', 'readwrite');
-            const store = transaction.objectStore('users');
+        if (error) {
+            setResetError('Erro ao redefinir a senha: ' + error.message);
+            return;
+        }
 
-            const getRequest = store.get(resetEmail);
+        setResetSuccess('Senha redefinida com sucesso!');
+        setResetEmail('');
+        setNewPassword('');
+    };
 
-            getRequest.onsuccess = () => {
-                const user = getRequest.result;
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
 
-                if (user) {
-                    user.password = newPassword;
-                    const updateRequest = store.put(user);
+        if (!email || !password) {
+            setError('Por favor, preencha todos os campos.');
+            setLoading(false);
+            return;
+        }
 
-                    updateRequest.onsuccess = () => {
-                        setResetSuccess('Senha redefinida com sucesso!');
-                        setResetEmail('');
-                        setNewPassword('');
-                    };
-
-                    updateRequest.onerror = () => {
-                        setResetError('Erro ao redefinir a senha.');
-                    };
-                } else {
-                    setResetError('Email não encontrado.');
-                }
-            };
-
-            getRequest.onerror = () => {
-                setResetError('Erro ao buscar o usuário.');
-            };
-        };
-
-        request.onerror = () => {
-            setResetError('Erro ao conectar ao banco de dados.');
-        };
+        if (isRegistering) {
+            handleRegister().finally(() => setLoading(false));
+        } else {
+            handleLogin().finally(() => setLoading(false));
+        }
     };
 
     return (
